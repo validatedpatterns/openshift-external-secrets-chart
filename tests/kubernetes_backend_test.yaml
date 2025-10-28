@@ -132,7 +132,7 @@ tests:
           path: spec.provider.kubernetes.server.url
           value: "https://my-api-server:6443"
 
-  - it: should set service account auth in kubernetes ClusterSecretStore
+  - it: should set service account auth in kubernetes ClusterSecretStore with default values
     templates:
       - templates/kubernetes/external-secrets-hub-secretstore.yaml
     set:
@@ -146,6 +146,26 @@ tests:
       - equal:
           path: spec.provider.kubernetes.auth.serviceAccount.namespace
           value: external-secrets
+
+  - it: should use configurable serviceAccount in kubernetes ClusterSecretStore
+    templates:
+      - templates/kubernetes/external-secrets-hub-secretstore.yaml
+    set:
+      global:
+        secretStore:
+          backend: "kubernetes"
+      ocpExternalSecrets:
+        rbac:
+          serviceAccount:
+            name: "custom-sa"
+            namespace: "custom-namespace"
+    asserts:
+      - equal:
+          path: spec.provider.kubernetes.auth.serviceAccount.name
+          value: custom-sa
+      - equal:
+          path: spec.provider.kubernetes.auth.serviceAccount.namespace
+          value: custom-namespace
 
   - it: should not set caProvider when disabled in kubernetes backend
     templates:

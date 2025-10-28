@@ -5,6 +5,13 @@ ocpExternalSecrets:
   rbac:
     # -- The name of the vault role when connecting to the vault from the hub
     rolename: "hub-role"
+    # -- ServiceAccount configuration for external secrets
+    # @default -- depends on the individual settings
+    serviceAccount:
+      # -- The name of the service account used by external secrets
+      name: "external-secrets"
+      # -- The namespace where the service account is created
+      namespace: "external-secrets"
 
   # -- Settings relevant when using the kubernetes backend
   # @default -- depends on the individual settings

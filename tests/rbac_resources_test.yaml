@@ -92,3 +92,48 @@ tests:
     asserts:
       - hasDocuments:
           count: 3
+
+  - it: should use configurable serviceAccount name and namespace
+    set:
+      ocpExternalSecrets.rbac.serviceAccount.name: "custom-sa"
+      ocpExternalSecrets.rbac.serviceAccount.namespace: "custom-namespace"
+    asserts:
+      - equal:
+          path: metadata.name
+          value: custom-sa
+        documentSelector:
+          path: kind
+          value: ServiceAccount
+      - equal:
+          path: metadata.namespace
+          value: custom-namespace
+        documentSelector:
+          path: kind
+          value: ServiceAccount
+      - equal:
+          path: metadata.name
+          value: custom-sa
+        documentSelector:
+          path: kind
+          value: Secret
+      - equal:
+          path: metadata.namespace
+          value: custom-namespace
+        documentSelector:
+          path: kind
+          value: Secret
+      - equal:
+          path: metadata.annotations["kubernetes.io/service-account.name"]
+          value: custom-sa
+        documentSelector:
+          path: kind
+          value: Secret
+      - contains:
+          path: subjects
+          content:
+            kind: ServiceAccount
+            name: custom-sa
+            namespace: custom-namespace
+        documentSelector:
+          path: kind
+          value: ClusterRoleBinding
