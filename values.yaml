@@ -70,5 +70,6 @@ global:
     backend: "vault"
 
 clusterGroup:
+  applications: {}
   # -- The variable that defines when a cluster is the HUB
-  isHubCluster: true
+  # (Deprecated) isHubCluster: true
