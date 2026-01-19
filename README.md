@@ -1,6 +1,6 @@
 # openshift-external-secrets
 
-![Version: 0.0.2](https://img.shields.io/badge/Version-0.0.2-informational?style=flat-square)
+![Version: 0.0.3](https://img.shields.io/badge/Version-0.0.3-informational?style=flat-square)
 
 A Helm chart to set up the Openshift External Secrets Operator
 
