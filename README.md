@@ -8,6 +8,44 @@ A Helm chart to set up the Openshift External Secrets Operator
 
 v0.0.4: Add vault.externalAddress to allow configuration of separate, unmanaged vault
 
+## Using a completely external Vault
+
+Use this when HashiCorp Vault is **not** deployed by Validated Patterns on the hub (for example a shared corporate Vault or a cluster-external service).
+
+1. **ClusterSecretStore backend** – Keep `global.secretStore.backend` as `vault` (or omit it; the chart defaults to Vault).
+
+2. **Vault API URL** – Set `ocpExternalSecrets.vault.externalAddress` to the reachable HTTPS base URL of your Vault (same value you would put in `spec.provider.vault.server`), for example `https://vault.example.corp:8200`. When this is empty, the chart targets the framework hub route `vault-vault.<global.hubClusterDomain>` instead.
+
+3. **KV engine** – Optional. Under `ocpExternalSecrets.vault.external`, set `kvPath` and/or `kvVersion` if your mount is not the default path `secret` or not KV v2. These keys are **only** read when `externalAddress` is non-empty; otherwise they are ignored.
+
+4. **Kubernetes auth on the external Vault** – On the Vault side, configure a Kubernetes auth mount and role that trust the External Secrets Operator service account (`ocpExternalSecrets.rbac.serviceAccount` in this chart). In values, you can pin the store to that Vault configuration by setting **both** `ocpExternalSecrets.vault.external.kubernetesMountPath` and `ocpExternalSecrets.vault.external.kubernetesRole`. If either is left empty, the chart falls back to the usual hub/spoke auth fields (`vault.mountPath`, `rbac.rolename`, or spoke `global.clusterDomain`), which may not match your external Vault and should be overridden for a fully external setup.
+
+5. **TLS / CA** – If Vault presents a certificate signed by a CA that is not the cluster default, keep `ocpExternalSecrets.caProvider.enabled` true and point `hostCluster` or `clientCluster` at a ConfigMap or Secret that holds the PEM for that CA, depending on whether you render this chart on the hub or a spoke.
+
+Example fragment:
+
+```yaml
+global:
+  secretStore:
+    backend: vault
+
+ocpExternalSecrets:
+  vault:
+    externalAddress: "https://vault.example.corp:8200"
+    external:
+      kvPath: "kv/my-team"
+      kvVersion: "v2"
+      kubernetesMountPath: "openshift/prod"
+      kubernetesRole: "external-secrets-prod"
+  caProvider:
+    enabled: true
+    hostCluster:
+      type: Secret
+      name: corp-vault-ca
+      key: ca.crt
+      namespace: external-secrets
+```
+
 ## Values
 
 | Key                                                   | Type   | Default                            | Description                                                                                                                                                                                                                                                                                              |
@@ -38,6 +76,11 @@ v0.0.4: Add vault.externalAddress to allow configuration of separate, unmanaged 
 | ocpExternalSecrets.rbac.serviceAccount.name           | string | `"ocp-external-secrets"`           | The name of the service account used by external secrets                                                                                                                                                                                                                                                 |
 | ocpExternalSecrets.rbac.serviceAccount.namespace      | string | `"external-secrets"`               | The namespace where the service account is created                                                                                                                                                                                                                                                       |
 | ocpExternalSecrets.vault                              | object | depends on the individual settings | Some vault configuration entries                                                                                                                                                                                                                                                                         |
+| ocpExternalSecrets.vault.external                     | object | depends on the individual settings | Settings below apply only when `externalAddress` is non-empty (ignored for framework-managed hub Vault).                                                                                                                                                                                                 |
+| ocpExternalSecrets.vault.external.kubernetesMountPath | string | `""`                               | Vault Kubernetes auth mount path for the external Vault. Must be set together with `kubernetesRole`; if either is empty, hub/spoke auth from this chart is used instead.                                                                                                                                 |
+| ocpExternalSecrets.vault.external.kubernetesRole      | string | `""`                               | Vault Kubernetes auth role for the external Vault. Must be set together with `kubernetesMountPath`.                                                                                                                                                                                                      |
+| ocpExternalSecrets.vault.external.kvPath              | string | `""`                               | KV mount path segment for `spec.provider.vault.path` (e.g. `secret` or a team-specific engine). Empty keeps the default `secret`.                                                                                                                                                                        |
+| ocpExternalSecrets.vault.external.kvVersion           | string | `""`                               | KV version (`v1` or `v2`). Empty keeps the default `v2`.                                                                                                                                                                                                                                                 |
 | ocpExternalSecrets.vault.externalAddress              | string | `""`                               | If non-empty, sets the Vault API URL on the ClusterSecretStore (`spec.provider.vault.server`), for example an external Vault reachable at an HTTPS URL you provide. When empty, the chart uses the in-cluster hub pattern `vault-vault` plus `global.hubClusterDomain` (no separate parameter required). |
 | ocpExternalSecrets.vault.mountPath                    | string | `"hub"`                            | The vault secrets' path when connecting to it from the hub                                                                                                                                                                                                                                               |
 

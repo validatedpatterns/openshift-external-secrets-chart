@@ -29,6 +29,19 @@ ocpExternalSecrets:
     # external Vault reachable at an HTTPS URL you provide. When empty, the chart uses the in-cluster hub pattern
     # `vault-vault` plus `global.hubClusterDomain` (no separate parameter required).
     externalAddress: ""
+    # -- Settings below apply only when `externalAddress` is non-empty (ignored for framework-managed hub Vault).
+    # @default -- depends on the individual settings
+    external:
+      # -- KV mount path segment for `spec.provider.vault.path` (e.g. `secret` or a team-specific engine). Empty keeps
+      # the default `secret`.
+      kvPath: ""
+      # -- KV version (`v1` or `v2`). Empty keeps the default `v2`.
+      kvVersion: ""
+      # -- Vault Kubernetes auth mount path for the external Vault. Must be set together with `kubernetesRole`; if
+      # either is empty, hub/spoke auth from this chart is used instead.
+      kubernetesMountPath: ""
+      # -- Vault Kubernetes auth role for the external Vault. Must be set together with `kubernetesMountPath`.
+      kubernetesRole: ""
     # -- The vault secrets' path when connecting to it from the hub
     mountPath: "hub"
 
