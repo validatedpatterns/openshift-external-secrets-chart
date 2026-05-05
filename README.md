@@ -1,16 +1,18 @@
 # openshift-external-secrets
 
-![Version: 0.0.3](https://img.shields.io/badge/Version-0.0.3-informational?style=flat-square)
+![Version: 0.0.4](https://img.shields.io/badge/Version-0.0.4-informational?style=flat-square)
 
 A Helm chart to set up the Openshift External Secrets Operator
 
 ## Notable changes
 
+v0.0.4: Add vault.externalAddress to allow configuration of separate, unmanaged vault
+
 ## Values
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| clusterGroup.isHubCluster | bool | `true` | The variable that defines when a cluster is the HUB |
+| clusterGroup.applications | object | `{}` |  |
 | global | object | depends on the individual settings | The global namespace containes some globally used variables used in patterns |
 | global.clusterDomain | string | `"foo.example.com"` | The DNS entry for the cluster the chart is being rendered on |
 | global.hubClusterDomain | string | `"hub.example.com"` | The DNS entry for the hub cluster |
@@ -36,6 +38,7 @@ A Helm chart to set up the Openshift External Secrets Operator
 | ocpExternalSecrets.rbac.serviceAccount.name | string | `"ocp-external-secrets"` | The name of the service account used by external secrets |
 | ocpExternalSecrets.rbac.serviceAccount.namespace | string | `"external-secrets"` | The namespace where the service account is created |
 | ocpExternalSecrets.vault | object | depends on the individual settings | Some vault configuration entries |
+| ocpExternalSecrets.vault.externalAddress | string | `""` | If non-empty, used as spec.parameters.vaultAddress (e.g. https://vault.example.com for an external Vault). Wh  en empty, the default hub route https://vault-vault.<global.hubClusterDomain> is used. |
 | ocpExternalSecrets.vault.mountPath | string | `"hub"` | The vault secrets' path when connecting to it from the hub |
 
 ----------------------------------------------
