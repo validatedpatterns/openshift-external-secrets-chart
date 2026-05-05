@@ -20,12 +20,14 @@ ocpExternalSecrets:
     remoteNamespace: "validated-patterns-secrets"
     server:
       # -- The URL used in the ClusterSecretStore
-      url: 'https://kubernetes.default'
+      url: "https://kubernetes.default"
 
   # -- Some vault configuration entries
   # @default -- depends on the individual settings
   vault:
-    # -- If non-empty, used as spec.parameters.vaultAddress (e.g. https://vault.example.com for an external Vault). Wh  en empty, the default hub route https://vault-vault.<global.hubClusterDomain> is used.
+    # -- If non-empty, sets the Vault API URL on the ClusterSecretStore (`spec.provider.vault.server`), for example an
+    # external Vault reachable at an HTTPS URL you provide. When empty, the chart uses the in-cluster hub pattern
+    # `vault-vault` plus `global.hubClusterDomain` (no separate parameter required).
     externalAddress: ""
     # -- The vault secrets' path when connecting to it from the hub
     mountPath: "hub"
