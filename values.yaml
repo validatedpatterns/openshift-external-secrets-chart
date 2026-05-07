@@ -32,6 +32,10 @@ ocpExternalSecrets:
     # -- Settings below apply only when `externalAddress` is non-empty (ignored for framework-managed hub Vault).
     # @default -- depends on the individual settings
     external:
+      # -- Arbitrary auth stanza rendered directly into `spec.provider.vault.auth` when `externalAddress` is non-empty.
+      # Use this for non-Kubernetes auth methods (for example AppRole, JWT/OIDC, token, LDAP, cert). When set, this
+      # takes precedence over `kubernetesMountPath`/`kubernetesRole` and `secretRef`.
+      auth: {}
       # -- KV mount path segment for `spec.provider.vault.path` (e.g. `secret` or a team-specific engine). Empty keeps
       # the default `secret`.
       kvPath: ""
@@ -42,6 +46,17 @@ ocpExternalSecrets:
       kubernetesMountPath: ""
       # -- Vault Kubernetes auth role for the external Vault. Must be set together with `kubernetesMountPath`.
       kubernetesRole: ""
+      # -- Secret reference used for `spec.provider.vault.auth.kubernetes.secretRef` when `externalAddress` is non-empty.
+      # All fields are required in that case and should point to an existing Secret holding the Kubernetes auth JWT.
+      # Ignored when `external.auth` is provided.
+      # @default -- depends on the individual settings
+      secretRef:
+        # -- Secret name for external Vault Kubernetes auth. Required when `externalAddress` is non-empty.
+        name: ""
+        # -- Namespace of the secret for external Vault Kubernetes auth. Required when `externalAddress` is non-empty.
+        namespace: ""
+        # -- Secret key containing the JWT token for external Vault Kubernetes auth. Required when `externalAddress` is non-empty.
+        key: ""
     # -- The vault secrets' path when connecting to it from the hub
     mountPath: "hub"
 
