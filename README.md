@@ -31,6 +31,8 @@ Use this when HashiCorp Vault is **not** deployed by Validated Patterns on the h
 
 7. **TLS / CA** – If Vault presents a certificate signed by a CA that is not the cluster default, keep `ocpExternalSecrets.caProvider.enabled` true and point `hostCluster` or `clientCluster` at a ConfigMap or Secret that holds the PEM for that CA, depending on whether you render this chart on the hub or a spoke.
 
+8. **Special Note** – The patterns framework will be unable to manage authentication, policy or inject secrets into a vault that it does not manage. In such cases, set `global.secretLoader.disabled` to `true` (in `values-global.yaml`) to prevent the secret loader from running locally during the `make install` phase.
+
 Example fragment:
 
 ```yaml
